@@ -1,0 +1,39 @@
+tetrate:
+  oidc:
+    url: https://keycloak.cloud.zwickey.net
+    clientId: tetrate-trader
+  accountServiceUrl: 'http://localhost:8082'
+  quoteServiceUrl: 'http://localhost:8081'
+spring:
+  profiles.active: local,localpostgres
+  application:
+     name: portfolio-service
+  jpa.hibernate.ddl-auto: create
+  main:
+      allow-bean-definition-overriding: true
+  config:
+    import: 'optional:configserver:'
+  cloud:
+    discovery:
+      enabled: false
+  security.oauth2:
+    resourceserver.jwt.issuer-uri: ${tetrate.oidc.url}/auth/realms/tetrate
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+info:
+  build:
+    group: ${group}
+    name: ${name}
+    description: ${description}
+    version: ${version}
+logging:
+  level:
+    io.tetrate: DEBUG
+    org.springframework.security: INFO
