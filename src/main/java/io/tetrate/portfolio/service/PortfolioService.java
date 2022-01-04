@@ -6,8 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -101,7 +99,7 @@ public class PortfolioService {
 		}
 
 		for (Quote quote : quotes) {
-			portfolio.getHolding(quote.getSymbol()).setCurrentValue(quote.getLastPrice());
+			portfolio.getHolding(quote.getSymbol()).setCurrentValue(new BigDecimal(quote.getLastPrice()));
 		}
 		portfolio.refreshTotalValue();
 		LOG.debug("Portfolio: " + portfolio);
@@ -149,12 +147,11 @@ public class PortfolioService {
 			
 		}
 
-
 		HttpHeaders headers = new HttpHeaders();
-		HttpEntity<String> entity = new HttpEntity<>("", headers);
+		HttpEntity<Transaction> entity = new HttpEntity<Transaction>(transaction, headers);
 		headers.add("Authorization", "Bearer " + bearerToken);
 		ResponseEntity<String> resp = restTemplate().exchange(accountServiceUrl + "/accounts/transaction", 
-							  HttpMethod.GET, 
+							  HttpMethod.POST, 
 							  entity, 
 							  String.class);
 		LOG.debug("accounts transaction response: {}", resp);    

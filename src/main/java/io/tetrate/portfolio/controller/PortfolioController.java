@@ -12,12 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -69,11 +67,17 @@ public class PortfolioController {
 	@PreAuthorize("hasAuthority('ROLE_TRADE')")
 	@PostMapping(value = "/portfolio")
 	public ResponseEntity<Order> addOrder(@RequestBody final Order order,
-										  @AuthenticationPrincipal JwtAuthenticationToken token) {
+										  @AuthenticationPrincipal Jwt token) {
 		LOG.debug("Adding Order: {}", order);
+		LOG.debug("User Token {}", token.getTokenValue());
+		LOG.debug("User Token id: {}", token.getId());
+		LOG.debug("User Token Subject: {}", token.getSubject());
+		LOG.debug("User Token Claims: {}", token.getClaims());
+		LOG.debug("User Token Headers: {}", token.getHeaders());
+		LOG.debug("User Token Eamil: {}", token.getClaimAsString("email"));
 		
-		order.setUserId(token.getName());
-		Order savedOrder = service.addOrder(order, token.getToken().getTokenValue());
+		order.setUserId(token.getClaimAsString("email"));
+		Order savedOrder = service.addOrder(order, token.getTokenValue());
 
 		LOG.debug("Order added: {}", savedOrder);
 		if (savedOrder != null && savedOrder.getOrderId() != null) {

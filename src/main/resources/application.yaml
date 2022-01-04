@@ -4,6 +4,7 @@ tetrate:
     clientId: tetrate-trader
   accountServiceUrl: 'http://localhost:8082'
   quoteServiceUrl: 'http://localhost:8081'
+spring.cloud.compatibility-verifier.enabled: false
 spring:
   profiles.active: local,localpostgres
   application:
@@ -16,8 +17,18 @@ spring:
   cloud:
     discovery:
       enabled: false
-  security.oauth2:
-    resourceserver.jwt.issuer-uri: ${tetrate.oidc.url}/auth/realms/tetrate
+  security:
+    oauth2:
+      client:
+        registration: 
+          keycloak: 
+            client-id: ${tetrate.oidc.clientId}
+            client-secret: tetrate-trader
+            scope: openid
+        provider:
+          keycloak:
+            user-name-attribute: preferred_username
+            issuer-uri: ${tetrate.oidc.url}/auth/realms/tetrate
 management:
   endpoints:
     web:
@@ -36,4 +47,4 @@ info:
 logging:
   level:
     io.tetrate: DEBUG
-    org.springframework.security: INFO
+    org.springframework.security: DEBUG
